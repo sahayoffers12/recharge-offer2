@@ -1,334 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Recharge Offer - Slider</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Arial, sans-serif;
-      background: #eaeaea;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 20px 0;
-    }
-    .container {
-      width: 100%;
-      max-width: 500px;
-      min-height: 100vh;
-      background: #f7f7f7;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 20px;
-    }
+<meta charset="UTF-8">
+<title>Smart Predictor</title>
 
-    /* HEADER */
-    .header-img-wrap { width: 100%; max-width: 500px; overflow: hidden; }
-    .header-img-wrap img { width: 100%; height: auto; object-fit: cover; display: block; }
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
 
-    /* SLIDER */
-    .slider {
-      width: 90%;
-      max-width: 450px;
-      aspect-ratio: 16/9;
-      position: relative;
-      overflow: hidden;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-      background: #000;
-      margin: 20px auto;
-      touch-action: pan-y;
-      user-select: none;
-    }
-    .slides { display: flex; width: 100%; height: 100%; transition: transform 0.8s ease-in-out; }
-    .slide-box { flex: 0 0 100%; height: 100%; }
-    .slide-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.container {
+  max-width: 420px;
+  margin: auto;
+  padding: 20px;
+}
 
-    /* CIRCLES + INPUTS */
-    .circle-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      gap: 18px;
-      margin-top: 10px;
-      padding: 0 15px;
-    }
-    .circle-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-    .circle {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2px solid #ddd;
-      background: #fff;
-      flex-shrink: 0;
-    }
-    .circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+input {
+  width: 95%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
 
-    /* INPUT / SELECT */
-    .input-box {
-      flex: 1 1 auto;
-      width: 100%;
-      height: 45px;
-      border: 1px solid #ccc;
-      border-radius: 25px;
-      padding: 0 15px;
-      font-size: 16px;
-      outline: none;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(90deg,#22c55e,#4ade80);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
 
-    select.input-box option {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.result {
+  margin-top: 20px;
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+}
 
-    /* SIM OPTIONS */
-    .sim-options {
-      display: flex;
-      justify-content: space-between;
-      flex: 1;
-      min-width: 0;
-    }
-    .sim {
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: 0.3s;
-      flex-shrink: 0;
-    }
-    .sim img { width: 100%; height: 100%; object-fit: cover; }
-    .sim:hover { transform: scale(1.1); }
-    .sim.active { border-color: #ff3c3c; }
+.bar {
+  height: 10px;
+  background: #374151;
+  border-radius: 5px;
+  margin-top: 10px;
+}
 
-    /* BUTTON */
-    .btn {
-      display: block;
-      width: 85%;
-      max-width: 450px;
-      height: 55px;
-      margin: 30px auto;
-      border: none;
-      border-radius: 30px;
-      background: linear-gradient(90deg,#ff6a00,#ff3c3c);
-      color: white;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-    }
-    .btn:active { transform: scale(0.98); }
-  </style>
+.fill {
+  height: 10px;
+  background: lime;
+  border-radius: 5px;
+}
+
+.green { color:#22c55e; }
+.red { color:#ef4444; }
+.violet { color:#a855f7; }
+
+.number {
+  font-size: 40px;
+}
+</style>
 </head>
+
 <body>
-  <div class="container">
 
-    <!-- HEADER -->
-    <div class="header-img-wrap">
-      <img src="https://i.ibb.co/XcqvpcM/Picsart-25-09-11-08-09-50-809.jpg" alt="Top Header Image">
-    </div>
+<div class="container">
+  <input type="text" id="input" placeholder="Enter numbers...">
+  <button onclick="predict()">Run</button>
+  <div class="result" id="output"></div>
+</div>
 
-    <!-- SLIDER -->
-    <div class="slider">
-      <div class="slides">
-        <!-- Clone Last -->
-        <div class="slide-box"><img src="https://i.ibb.co/RkS1R02t/New-Project-2-7-C00813.png" alt="Clone Last"></div>
-        
-        <!-- Originals -->
-        <div class="slide-box"><img src="https://i.ibb.co/6V4qkwg/Screenshot-20250912-141213-Gallery.jpg" alt="Banner 1"></div>
-        <div class="slide-box"><img src="https://i.ibb.co/RkS1R02t/New-Project-2-7-C00813.png" alt="Banner 2"></div>
-        
-        <!-- Clone First -->
-        <div class="slide-box"><img src="https://i.ibb.co/6V4qkwg/Screenshot-20250912-141213-Gallery.jpg" alt="Clone First"></div>
-      </div>
-    </div>
+<script>
 
-    <!-- CIRCLES + INPUTS -->
-    <div class="circle-container">
+let input = document.getElementById("input");
 
-      <!-- 1. Mobile Input -->
-      <div class="circle-row">
-        <div class="circle"><img src="https://i.ibb.co/Pvkm0j95/New-Project-3-F9-FDC3-B.png" alt="Mobile"></div>
-        <input id="mobile" type="tel" maxlength="10" class="input-box" placeholder="Enter 10 digit mobile number">
-      </div>
+input.addEventListener("input", e=>{
+  let val = e.target.value.replace(/[^0-9]/g,"");
+  e.target.value = val.split("").join(",");
+});
 
-      <!-- 2. SIM Selection -->
-      <div class="circle-row">
-        <div class="circle"><img src="https://i.ibb.co/x8HdwFcR/New-Project-3-222-F2-CB.png" alt="SIM"></div>
-        <div class="sim-options">
-          <div class="sim" data-sim="Jio"><img src="https://i.ibb.co/pBSMhKpj/jio-logo-icon.png" alt="Jio"></div>
-          <div class="sim" data-sim="Airtel"><img src="https://i.ibb.co/2QYVVXJ/Airtel-logo-01.png" alt="Airtel"></div>
-          <div class="sim" data-sim="VI"><img src="https://i.ibb.co/fYQkWZV4/a6cc4046855053e3e04feae9b851a7ad.jpg" alt="VI"></div>
-          <div class="sim" data-sim="BSNL"><img src="https://i.ibb.co/XZhJC0vD/Picsart-25-09-12-08-18-47-739.jpg" alt="BSNL"></div>
-        </div>
-      </div>
+function getColor(n){
+  if([1,3,7,9].includes(n)) return "green";
+  if([2,4,6,8].includes(n)) return "red";
+  return "violet";
+}
 
-      <!-- 3. Plan Selection -->
-      <div class="circle-row">
-        <div class="circle"><img src="https://i.ibb.co/bgNvgyDg/New-Project-3-7-B39-B3-D.png" alt="Plan"></div>
-        <select id="plan" class="input-box">
-          <option>Select Plan</option>
-        </select>
-      </div>
+function getSize(n){
+  return n<=4?"small":"big";
+}
 
-      <!-- 4. Circle/Region Selection -->
-      <div class="circle-row">
-        <div class="circle"><img src="https://i.ibb.co/wFmHPBHF/New-Project-3-05-CBCF6.png" alt="Circle"></div>
-        <select id="circle" class="input-box">
-          <option>Select Circle</option>
-          <option>Andhra Pradesh & Telangana</option>
-          <option>Assam</option>
-          <option>Bihar & Jharkhand</option>
-          <option>Chennai</option>
-          <option>Delhi & NCR</option>
-          <option>Gujarat</option>
-          <option>Haryana</option>
-          <option>Himachal Pradesh</option>
-          <option>Jammu & Kashmir</option>
-          <option>Karnataka</option>
-          <option>Kerala</option>
-          <option>Kolkata</option>
-          <option>Madhya Pradesh & Chhattisgarh</option>
-          <option>Maharashtra & Goa</option>
-          <option>Mumbai</option>
-          <option>North East</option>
-          <option>Odisha</option>
-          <option>Punjab</option>
-          <option>Rajasthan</option>
-          <option>Tamil Nadu</option>
-          <option>Uttar Pradesh East</option>
-          <option>Uttar Pradesh West & Uttarakhand</option>
-          <option>West Bengal</option>
-        </select>
-      </div>
-    </div>   
-    
-    <!-- BUTTON -->
-    <button class="btn" id="rechargeBtn">Recharge Now</button>
-  </div>
+function pick(obj){
+  let sum = Object.values(obj).reduce((a,b)=>a+b,0);
+  let r = Math.random()*sum;
+  let acc = 0;
+  for(let k in obj){
+    acc += obj[k];
+    if(r<=acc) return k;
+  }
+}
 
-  <script>
-    /* SLIDER SCRIPT */
-    const slides = document.querySelector('.slides');
-    const slideBoxes = document.querySelectorAll('.slide-box');
-    let index = 1;
-    const totalSlides = slideBoxes.length;
+function predict(){
+  let arr = input.value.split(",").map(Number).filter(n=>!isNaN(n));
 
-    slides.style.transform = `translateX(${-index * 100}%)`;
+  if(arr.length < 10){
+    alert("10+ numbers daalo");
+    return;
+  }
 
-    function updateSlider(animate = true) {
-      slides.style.transition = animate ? "transform 0.8s ease-in-out" : "none";
-      slides.style.transform = `translateX(${-index * 100}%)`;
+  let score = {green:1, red:1, violet:1};
+  let sizeScore = {big:1, small:1};
+
+  arr.forEach((n,i)=>{
+    let w = (i+1)/arr.length;
+    score[getColor(n)] += w;
+    sizeScore[getSize(n)] += w;
+  });
+
+  let lastColor = getColor(arr[arr.length-1]);
+  let streak = 0;
+
+  for(let i=arr.length-1;i>=0;i--){
+    if(getColor(arr[i])===lastColor) streak++;
+    else break;
+  }
+
+  let continueChance = 50;
+  let breakChance = 50;
+  let reason = "";
+
+  if(streak >= 4){
+    continueChance = 60;
+    breakChance = 40;
+
+    if(Math.random() < 0.6){
+      score[lastColor] += 2;
+      reason += "Continue bias<br>";
+    } else {
+      score[lastColor] *= 0.5;
+      reason += "Break pressure<br>";
     }
-    function nextSlide() { index++; updateSlider(true); }
-    function prevSlide() { index--; updateSlider(true); }
+  }
 
-    slides.addEventListener('transitionend', () => {
-      if (index === totalSlides - 1) { index = 1; updateSlider(false); }
-      else if (index === 0) { index = totalSlides - 2; updateSlider(false); }
-    });
+  if(lastColor==="violet" || arr[arr.length-1]===0){
+    score.green += 2;
+    score.red += 2;
+    reason += "Reset<br>";
+  }
 
-    let autoSlide = setInterval(nextSlide, 4000);
+  let lastTwo = arr.slice(-2).map(getColor);
+  if(lastTwo[0]===lastTwo[1]){
+    score[lastTwo[0]] *= 0.7;
+    reason += "Anti repeat<br>";
+  }
 
-    /* ---- MOBILE SWIPE ---- */
-    let startX = 0, isDragging = false;
-    slides.addEventListener("touchstart", e => { startX = e.touches[0].clientX; isDragging = true; clearInterval(autoSlide); });
-    slides.addEventListener("touchend", e => {
-      if (!isDragging) return;
-      let diff = e.changedTouches[0].clientX - startX;
-      if (diff > 50) prevSlide();
-      else if (diff < -50) nextSlide();
-      isDragging = false;
-      autoSlide = setInterval(nextSlide, 4000);
-    });
+  let color = pick(score);
+  let size = pick(sizeScore);
 
-    /* ---- DESKTOP MOUSE DRAG ---- */
-    let mouseStartX = 0, mouseDown = false;
-    slides.addEventListener("mousedown", e => { mouseStartX = e.clientX; mouseDown = true; clearInterval(autoSlide); });
-    slides.addEventListener("mouseup", e => {
-      if (!mouseDown) return;
-      let diff = e.clientX - mouseStartX;
-      if (diff > 50) prevSlide();
-      else if (diff < -50) nextSlide();
-      mouseDown = false;
-      autoSlide = setInterval(nextSlide, 4000);
-    });
-    slides.addEventListener("mouseleave", () => { mouseDown = false; });
+  let pool = [];
+  for(let i=0;i<=9;i++){
+    if(getColor(i)===color && getSize(i)===size){
+      pool.push(i);
+    }
+  }
 
-    /* SIM SELECTION SCRIPT */
-    const sims = document.querySelectorAll('.sim');
-    const planSelect = document.getElementById("plan");
-    let selectedSim = "";
+  if(pool.length === 0){
+    pool = [0,1,2,3,4,5,6,7,8,9];
+  }
 
-    const simPlans = {
-      "Jio": ["₹198 - 14 Days - 2GB/day + 5G Unlimited", "₹239 - 22Days - 1.5GB/day", "₹319 - 1 months - 1.5GB/day", "₹349 - 28 Days - 2GB/day + 5G Unlimited", "₹399 - 28 Days - 2.5GB/day + 5G Unlimited", "₹629 - 56 Days - 2GB/day + 5G Unlimited", "₹859 - 84 Days - 2GB/day + 5G Unlimited"],
-      "Airtel": ["₹189 - 21 Days - 1GB/day", "₹199 - 28 Days - 2GB data", "₹299 - 28 Days - 1GB/day", "₹349 - 28 Days - 1.5GB/day + 5G Unlimited", "₹399 - 28 Days - 2.5GB/day + 5G Unlimited", "₹579 - 56 Days - 1.5GB/day", "₹649 - 56 Days - 2GB/day + 5G Unlimited", "₹859 - 84 Days - 1.5GB/day"],
-      "VI": ["₹199 - 28 Days - 2GB/data", "₹249 - 24 Days - 1GB/day", "₹299 - 28 Days - 1GB/day", "₹349 - 28 Days - 1.5GB/day", "₹579 - 56 Days - 1.5GB/day", "₹859 - 84 Days - 1.5GB/day"],
-      "BSNL": ["₹147 - 25 Days - Unlimited data", "₹153 - 25 Days - 25GB(1GB/day)", "₹199 - 28 Days - Unlimited(2GB/day)", "₹347 - 50 Days - Unlimited(2GB/day)", "₹485 - 72 Days - Unlimited(2GB/day)"]
-    };
+  let number = pool[Math.floor(Math.random()*pool.length)];
 
-    sims.forEach(sim => {
-      sim.addEventListener('click', () => {
-        sims.forEach(s => s.classList.remove('active'));
-        sim.classList.add('active');
-        selectedSim = sim.dataset.sim;
+  let conf = Math.min(85, Math.floor((score[color]/Object.values(score).reduce((a,b)=>a+b))*100));
 
-        planSelect.innerHTML = "<option>Select Plan</option>";
-        simPlans[selectedSim].forEach(p => {
-          let opt = document.createElement("option");
-          opt.textContent = p;
-          planSelect.appendChild(opt);
-        });
-      });
-    });
+  document.getElementById("output").innerHTML = `
+    <p class="${color}">${color.toUpperCase()}</p>
+    <p>${size.toUpperCase()}</p>
+    <div class="number">${number}</div>
 
-    /* RECHARGE BUTTON */
-    document.getElementById("rechargeBtn").addEventListener("click", () => {
-      const mobile = document.getElementById("mobile").value.trim();
-      const plan = planSelect.value;
-      const circle = document.getElementById("circle").value;
+    <div class="bar">
+      <div class="fill" style="width:${conf}%"></div>
+    </div>
 
-      if (!mobile || mobile.length !== 10) {
-        alert("Please enter valid 10 digit mobile number");
-        return;
-      }
-      if (!selectedSim) {
-        alert("Please select a SIM");
-        return;
-      }
-      if (plan === "Select Plan") {
-        alert("Please select a Plan");
-        return;
-      }
-      if (circle === "Select Circle") {
-        alert("Please select Circle");
-        return;
-      }
+    <p>Confidence: ${conf}%</p>
+    <p>Continue: ${continueChance}% | Break: ${breakChance}%</p>
+    <hr>
+    <p>${reason}</p>
+  `;
+}
 
-      const msg = `Recharge Request%0A📱 Mobile: ${mobile}%0A📶 SIM: ${selectedSim}%0A💳 Plan: ${plan}%0A🌍 Circle: ${circle}`;
-      window.location.href = `https://wa.me/916307536245?text=${msg}`;
-    });
-  </script>
+</script>
+
 </body>
-  </html>
-
-
-
-
-
+</html>
