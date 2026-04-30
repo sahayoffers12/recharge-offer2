@@ -5,9 +5,7 @@
 <title>Smart Predictor</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -19,6 +17,7 @@ body {
   height: 100vh;
 }
 
+/* phone frame */
 .phone {
   width: 360px;
   height: 640px;
@@ -26,8 +25,11 @@ body {
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   padding: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* input */
 input {
   width: 100%;
   padding: 12px;
@@ -37,7 +39,8 @@ input {
   margin-bottom: 10px;
 }
 
-button {
+/* button */
+button.main {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
@@ -45,14 +48,16 @@ button {
   background: #22c55e;
   color: white;
   font-size: 18px;
+  margin-bottom: 10px;
 }
 
+/* result */
 .result {
-  margin-top: 15px;
   background: white;
-  padding: 15px;
-  border-radius: 12px;
+  padding: 10px;
+  border-radius: 10px;
   text-align: center;
+  margin-bottom: 10px;
 }
 
 .green { color:#16a34a; }
@@ -60,53 +65,148 @@ button {
 .violet { color:#9333ea; }
 
 .number {
-  font-size: 50px;
+  font-size: 40px;
   font-weight: bold;
 }
-</style>
 
+/* confidence bar */
+.bar {
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.fill {
+  height: 8px;
+  background: #22c55e;
+  border-radius: 5px;
+}
+
+/* keypad */
+.pad {
+  margin-top: auto;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.row button {
+  flex: 1;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+}
+.row button:active {
+  transform: scale(0.95);
+}
+</style>
 </head>
 
 <body>
 
 <div class="phone">
-  <input type="text" id="input" placeholder="Enter numbers...">
-  <button onclick="predict()">Predict</button>
+
+  <input type="text" id="input" placeholder="Tap numbers below...">
+  
+  <button class="main" onclick="predict()">Predict</button>
+
   <div class="result" id="output">Result yahan dikhega</div>
+
+  <!-- number pad -->
+  <div class="pad">
+    <div class="row">
+      <button onclick="addNum(1)">1</button>
+      <button onclick="addNum(2)">2</button>
+      <button onclick="addNum(3)">3</button>
+    </div>
+    <div class="row">
+      <button onclick="addNum(4)">4</button>
+      <button onclick="addNum(5)">5</button>
+      <button onclick="addNum(6)">6</button>
+    </div>
+    <div class="row">
+      <button onclick="addNum(7)">7</button>
+      <button onclick="addNum(8)">8</button>
+      <button onclick="addNum(9)">9</button>
+    </div>
+    <div class="row">
+      <button onclick="clearAll()">C</button>
+      <button onclick="addNum(0)">0</button>
+      <button onclick="backspace()">⌫</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
 
 let input = document.getElementById("input");
 
-input.addEventListener("input", e=>{
-  let val = e.target.value.replace(/[^0-9]/g,"");
-  e.target.value = val.split("").join(",");
-});
+// add number
+function addNum(n){
+  if(input.value === ""){
+    input.value = n;
+  } else {
+    input.value += "," + n;
+  }
+}
 
+// remove last
+function backspace(){
+  let arr = input.value.split(",");
+  arr.pop();
+  input.value = arr.join(",");
+}
+
+// clear all
+function clearAll(){
+  input.value = "";
+}
+
+// helpers
 function getColor(n){
   if([1,3,7,9].includes(n)) return "green";
   if([2,4,6,8].includes(n)) return "red";
   return "violet";
 }
-
 function getSize(n){
-  return n<=4?"small":"big";
+  return n<=4 ? "small" : "big";
 }
 
+// prediction
 function predict(){
   let arr = input.value.split(",").map(Number).filter(n=>!isNaN(n));
 
-  if(arr.length < 10){
-    alert("10+ numbers daalo");
+  if(arr.length < 5){
+    alert("Kam se kam 5 numbers daalo");
     return;
   }
 
-  let colorList = ["green","red","violet"];
-  let sizeList = ["small","big"];
+  let score = {green:1, red:1, violet:1};
+  let sizeScore = {big:1, small:1};
 
-  let color = colorList[Math.floor(Math.random()*3)];
-  let size = sizeList[Math.floor(Math.random()*2)];
+  arr.forEach((n,i)=>{
+    let w = (i+1)/arr.length;
+    score[getColor(n)] += w;
+    sizeScore[getSize(n)] += w;
+  });
+
+  function pick(obj){
+    let sum = Object.values(obj).reduce((a,b)=>a+b,0);
+    let r = Math.random()*sum;
+    let acc = 0;
+    for(let k in obj){
+      acc += obj[k];
+      if(r<=acc) return k;
+    }
+  }
+
+  let color = pick(score);
+  let size = pick(sizeScore);
 
   let pool = [];
   for(let i=0;i<=9;i++){
@@ -115,13 +215,23 @@ function predict(){
     }
   }
 
+  if(pool.length === 0){
+    pool = [0,1,2,3,4,5,6,7,8,9];
+  }
+
   let number = pool[Math.floor(Math.random()*pool.length)];
-  let conf = Math.floor(Math.random()*40)+50;
+
+  let conf = Math.floor(Math.random()*30)+50;
 
   document.getElementById("output").innerHTML = `
     <p class="${color}">${color.toUpperCase()}</p>
     <p>${size.toUpperCase()}</p>
     <div class="number">${number}</div>
+
+    <div class="bar">
+      <div class="fill" style="width:${conf}%"></div>
+    </div>
+
     <p>Confidence: ${conf}%</p>
   `;
 }
